@@ -77,7 +77,7 @@ public class MainActivity extends MainActivityBase {
         // Call local helper method to setup a broadcast receiver
         // that will receive and display a list  of local image URLs.
         // TODO -- you fill in here.
-
+        setupBroadcastReceiver();
     }
 
     /**
@@ -87,16 +87,16 @@ public class MainActivity extends MainActivityBase {
     protected void onDestroy() {
         // Unregister the broadcast receiver.
         // TODO -- you fill in here.
-
+        unregisterReceiver(mBroadcastReceiver);
 
         // Always call super method.
         // TODO -- you fill in here.
-
+        super.onDestroy();
     }
 
 
     /**
-     * Template method hook method required fro starting a download operation.
+     * Template method hook method required for starting a download operation.
      *
      * @param urls list of URLs to download.
      */
@@ -104,7 +104,7 @@ public class MainActivity extends MainActivityBase {
     protected void startDownload(ArrayList<Uri> urls) {
         // Start the Gallery Activity with the passed in Uri(s)
         // TODO -- you fill in here.
-
+        GalleryActivity.makeStartIntent(this, urls);
     }
 
     /**
@@ -117,7 +117,7 @@ public class MainActivity extends MainActivityBase {
     protected void startDownloadForResult(ArrayList<Uri> urls) {
         // Start the Gallery Activity for result with the passed in Uris(s).
         // TODO -- you fill in here.
-
+        GalleryActivity.makeStartIntent(this, urls);
     }
 
     /**
@@ -136,7 +136,13 @@ public class MainActivity extends MainActivityBase {
         // Create a new instance of the local broadcast receiver
         // class object (defined below).
         // TODO -- you fill in here.
-
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                IntentFilter myFilter = new IntentFilter(ACTION_VIEW_LOCAL);
+                registerReceiver(mBroadcastReceiver, myFilter);
+            }
+        };
 
         // Create a new broadcast intent filter that will
         // filter (receive) ACTION_VIEW intents.
