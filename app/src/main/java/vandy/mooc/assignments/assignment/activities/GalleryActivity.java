@@ -1,5 +1,6 @@
 package vandy.mooc.assignments.assignment.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,16 +59,16 @@ public class GalleryActivity
         // using the passed context along with the class identifier
         // for this class.
         // TODO -- you fill in here.
-
+        Intent intent = new Intent(context, GalleryActivity.class);
 
         // Put the received list of input URLs as an intent
         // extra using the predefined INTENT_EXTRA_URLS extra name.
         // TODO -- you fill in here.
-
+        intent.putParcelableArrayListExtra(INTENT_EXTRA_URLS, inputUrls);
 
         // Return the intent.
         // TODO -- you fill in here.
-
+        return intent;
     }
 
     /*
@@ -92,6 +94,8 @@ public class GalleryActivity
             // starting intent and pass these URLs into the super class using
             // the setItems() helper method.
             // TODO -- you fill in here.
+            List<Uri> list = extractInputUrlsFromIntent(this.getIntent());
+            super.setItems(list);
 
         } else {
             // The activity is being recreated after configuration change.
@@ -105,7 +109,7 @@ public class GalleryActivity
         // Call base class helper method to register your downloader
         // implementation class.
         // TODO -- you fill in here.
-
+        super.registerDownloader(AsyncTaskDownloader.class);
     }
 
     /**
@@ -122,7 +126,9 @@ public class GalleryActivity
         // validateInput() helper method. If the entire list of received URLs
         // are valid, then return this list. Otherwise return null.
         // TODO -- you fill in here.
-
+        ArrayList<Uri> list = intent.getParcelableArrayListExtra(INTENT_EXTRA_URLS);
+        if(validateInput(list)) return list;
+        return null;
     }
 
     /**
@@ -148,11 +154,26 @@ public class GalleryActivity
         //
         // Return true if all the URLs are valid.
         // TODO -- you fill in here.
-
+        boolean allElementsValid = true;
+        if(inputUrls == null) {
+            ViewUtils.showToast(this, "R.string.input_url_list_is_null");
+        }
+        else if(inputUrls.size() == 0) {
+            ViewUtils.showToast(this, "R.string.input_url_list_is_empty");
+        }
+        else {
+            for(Uri url : inputUrls){
+                boolean checkResult;
+                checkResult = URLUtil.isValidUrl(url.toString());
+                if(!checkResult) {
+                    allElementsValid = false;
+                }
+            }
+        }
 
         // Input passed all tests, so return true.
         // TODO -- you fill in here.
-
+        return allElementsValid;
     }
 
     /**
@@ -172,7 +193,9 @@ public class GalleryActivity
         // outputUrls list into the intent as an ParcelableArrayListExtra,
         // and return the intent.
         // TODO -- you fill in here.
-
+        Intent resultIntent = new Intent(this, GalleryActivity.class);
+        resultIntent.putParcelableArrayListExtra(INTENT_EXTRA_URLS, outputUrls);
+        return resultIntent;
     }
 
     /**
@@ -189,16 +212,16 @@ public class GalleryActivity
         // intent that contains the list of currently displayed URLs
         // as an intent extra.
         // TODO -- you fill in here.
-
+        Intent returnIntent = makeResultIntent(urls);
 
         // Now set the result intent to return.
         // TODO -- you fill in here.
-
+        this.setResult(Activity.RESULT_OK, returnIntent);
 
         // Call an Activity method to end this activity and return
         // to parent activity.
         // TODO -- you fill in here.
-
+        GalleryActivity.this.finish();
 
         Log.d(TAG, "Activity finished.");
     }
@@ -219,25 +242,25 @@ public class GalleryActivity
         // ACTION_VIEW_LOCAL as expected by the MainActivity's
         // BroadcastReceiver implementation.
         // TODO -- you fill in here.
-
+        Intent dataIntent = new Intent(this, GalleryActivity.class);
 
         // put the received outputUrls list into the intent as an
         // ParcelableArrayListExtra.
         // TODO -- you fill in here.
-
+        dataIntent.getParcelableArrayListExtra("extra_urls");
 
         // Set the intent action to ACTION_VIEW_LOCAL as is
         // expected by the MainActivity's BroadcastReceiver implementation.
         // TODO -- you fill in here.
-
+        dataIntent.setAction("ActionViewLocalBroadcast");
 
         //  Return the intent.
         // TODO -- you fill in here.
-
+        return dataIntent;
     }
 
     /**
-     * Creates a data results intent, broadcasts this the intent intent (to the
+     * Creates a data results intent, broadcasts this the intent (to the
      * MainActivity), and finishes this activity.
      *
      * @param outputUrls A list of local image URLs to broadcast.
@@ -250,17 +273,17 @@ public class GalleryActivity
         // that can be used to broadcast the downloaded image list to
         // a BroadcastReceiver (the MainActivity).
         // TODO -- you fill in here.
-
+        Intent bIntent = makeBroadcastIntent(outputUrls);
 
         // Call the Activity class helper method to
         // send this intent in a local broadcast to the main activity.
         // TODO -- you fill in here.
-
+        sendBroadcast(bIntent);
 
         // Call an Activity method to end this activity and return
         // to parent activity.
         // TODO -- you fill in here.
-
+        GalleryActivity.this.finish();
 
         Log.d(TAG, "Activity finished.");
     }

@@ -180,7 +180,19 @@ public class MainActivity extends MainActivityBase {
         // We are only interested in results returned by the
         // DownloadActivity.
         // TODO -- you fill in here.
-
+        if(requestCode == DOWNLOAD_REQUEST_CODE){
+            if(resultCode == RESULT_OK){
+                extractAndUpdateUrls(data);
+            }
+            else{
+                ViewUtils.showToast(this, R.string.download_activity_cancelled);
+            }
+            return;
+        }
+        else{
+            //ViewUtils.showToast(this, );
+            super.onActivityResult(requestCode, resultCode, data);
+        }
 
             // If the result code is RESULT_OK, then
             // call a local helper method to extract and display the returned
@@ -221,17 +233,20 @@ public class MainActivity extends MainActivityBase {
         // Extract the list of downloaded image URLs from the
         // passed intent.
         // TODO -- you fill in here.
-
+        ArrayList<Uri> list = intent.getParcelableArrayListExtra("extra_urls");
 
         // If the list is empty, call ViewUtils show toast helper
         // to display the string resource R.string.no_images_received.
         // TODO -- you fill in here.
-
-
+        if(list == null) {
+            ViewUtils.showToast(this, "R.string.no_images_received");
+        }
         // Always call the base class setItems() helper which
         // will refresh the layout to show the received list of URLs.
         // TODO -- you fill in here.
-
+        else{
+            setItems(list);
+        }
     }
 
 
@@ -266,7 +281,7 @@ public class MainActivity extends MainActivityBase {
             // call helper method to extract and display
             // the received list of image URLs.
             // TODO -- you fill in here.
-
+            extractAndUpdateUrls(intent);
         }
     }
 }
